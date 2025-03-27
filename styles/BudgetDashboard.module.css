@@ -1,0 +1,142 @@
+/* 📦 전체 컨테이너 */
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  
+  /* 🔻 헤더 영역 (월/이동/추가 버튼) */
+  .headerRow {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 10px;
+    position: relative; /* +버튼 위치 설정을 위해 relative */
+  }
+  
+  /* 📊 수입/지출/잔액 요약 */
+  .summaryBox {
+    background: #f3f3f3;
+    padding: 10px 15px;
+    border-radius: 8px;
+    text-align: center;
+    font-weight: bold;
+    margin-bottom: 15px;
+  }
+  
+  /* 📆 요일 표시줄 */
+  .weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    text-align: center;
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: #333;
+  }
+  .weekday {
+    padding: 8px 0;
+    background: #f9f9f9;
+  }
+  
+  /* 📅 달력 그리드 */
+  .calendarGrid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr); /* 7열 고정 */
+    gap: 4px;
+  }
+  .dateCell {
+    min-height: 60px;
+    padding: 5px;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    text-align: center;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+  .dateCell:hover {
+    background-color: #f0f8ff;
+  }
+  .day {
+    font-weight: bold;
+    margin-bottom: 3px;
+  }
+  
+  /* 📋 상세 내역 박스 */
+  .detailBox {
+    margin-top: 20px;
+    background: #fffbe6;
+    border: 1px solid #fbc02d;
+    padding: 16px;
+    border-radius: 8px;
+  }
+  
+  /* ➕ 추가 버튼 */
+  .addButton {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: #1976d2;
+    color: white;
+    font-size: 20px;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  .addButton:hover {
+    background-color: #1565c0;
+  }
+  
+  /* 🧾 입력 폼을 담는 래퍼 (모달 내에서 사용 가능) */
+  .formWrapper {
+    margin-top: 20px;
+  }
+  /* 📱 반응형 디자인: 모바일 대응 */
+@media (max-width: 600px) {
+    .container {
+      padding: 10px;
+    }
+  
+    .headerRow {
+      flex-direction: column;
+      gap: 10px;
+      align-items: flex-start;
+    }
+  
+    .summaryBox {
+      font-size: 0.9rem;
+      padding: 8px;
+    }
+  
+    .weekdays {
+      font-size: 0.85rem;
+    }
+  
+    .calendarGrid {
+      gap: 2px;
+    }
+  
+    .dateCell {
+      min-height: 50px;
+      font-size: 0.75rem;
+      padding: 4px;
+    }
+  
+    .detailBox {
+      font-size: 0.9rem;
+      padding: 12px;
+    }
+  
+    .addButton {
+      top: 10px;
+      right: 10px;
+      width: 36px;
+      height: 36px;
+      font-size: 18px;
+    }
+  }

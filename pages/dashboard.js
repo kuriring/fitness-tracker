@@ -9,6 +9,7 @@ import {
   FaChartLine,
   FaTrophy,
   FaClipboardList,
+  FaMoneyBillWave, // 💰 아이콘 추가
 } from "react-icons/fa";
 import CalendarTracker from "../components/CalendarTracker";
 import "../styles/dashboard.css";
@@ -38,6 +39,8 @@ export default function Dashboard() {
           <NavItem icon={<FaChartLine />} label="체중 변화 추이" onClick={() => router.push("/weight-trend")} />
           <NavItem icon={<FaTrophy />} label="챌린지" onClick={() => router.push("/challenge")} />
           <NavItem icon={<FaDumbbell />} label="1RM 기록실" onClick={() => router.push("/one-rep-max")} />
+          <div className="sidebar-title">💰 Budget</div>
+          <NavItem icon={<FaMoneyBillWave />} label="Budget" onClick={() => router.push("/BudgetDashboard")} /> {/* ✅ 추가 */}
           <button className="logout-button" onClick={handleLogout}>
             <FaSignOutAlt /> 로그아웃
           </button>
