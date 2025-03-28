@@ -1,8 +1,9 @@
-// ExpenseForm.js
 import React, { useState, useEffect } from "react";
 import { Modal, Box, Typography, Button } from "@mui/material";
 import { db } from "../lib/firebase";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
+import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 
 export default function ExpenseForm({ onSubmitComplete }) {
   const [amount, setAmount] = useState("");
@@ -10,6 +11,7 @@ export default function ExpenseForm({ onSubmitComplete }) {
   const [category, setCategory] = useState("");
   const [payment, setPayment] = useState("");
   const [memo, setMemo] = useState("");
+  const [date, setDate] = useState(new Date());
 
   const [categories, setCategories] = useState([]);
   const [payments, setPayments] = useState([]);
@@ -18,7 +20,6 @@ export default function ExpenseForm({ onSubmitComplete }) {
   const [modalType, setModalType] = useState("");
   const [newItem, setNewItem] = useState("");
 
-  // 🔄 Firestore에서 카테고리 및 결제 수단 불러오기
   useEffect(() => {
     const fetchSettings = async () => {
       try {
@@ -26,11 +27,8 @@ export default function ExpenseForm({ onSubmitComplete }) {
         const snap = await getDoc(ref);
         if (snap.exists()) {
           const data = snap.data();
-          console.log("📦 불러온 설정 데이터:", data); // ✅ 추가
           setCategories(Array.isArray(data.categories) ? data.categories : []);
           setPayments(Array.isArray(data.payments) ? data.payments : []);
-        } else {
-          console.log("📛 설정 문서가 존재하지 않음!");
         }
       } catch (err) {
         console.error("❌ 설정 불러오기 오류:", err);
@@ -53,7 +51,7 @@ export default function ExpenseForm({ onSubmitComplete }) {
       category,
       payment,
       memo,
-      date: new Date(),
+      date,
     };
 
     try {
@@ -70,6 +68,7 @@ export default function ExpenseForm({ onSubmitComplete }) {
         setCategory("");
         setPayment("");
         setMemo("");
+        setDate(new Date());
         onSubmitComplete();
       } else {
         alert(`❌ 오류: ${result.error}`);
@@ -115,7 +114,16 @@ export default function ExpenseForm({ onSubmitComplete }) {
     <form onSubmit={handleSubmit} style={{ padding: "20px", maxWidth: "500px", margin: "auto" }}>
       <h2>💰 가계부 입력</h2>
 
-      <div style={{ marginBottom: "15px" }}>
+      <LocalizationProvider dateAdapter={AdapterDateFns}>
+        <DatePicker
+          label="날짜 선택"
+          value={date}
+          onChange={(newDate) => setDate(newDate)}
+          slotProps={{ textField: { fullWidth: true, required: true } }}
+        />
+      </LocalizationProvider>
+
+      <div style={{ marginTop: "15px", marginBottom: "15px" }}>
         <label>
           <input
             type="radio"
@@ -123,8 +131,7 @@ export default function ExpenseForm({ onSubmitComplete }) {
             value="income"
             checked={type === "income"}
             onChange={() => setType("income")}
-          />
-          수입
+          /> 수입
         </label>
         <label style={{ marginLeft: "15px" }}>
           <input
@@ -133,12 +140,11 @@ export default function ExpenseForm({ onSubmitComplete }) {
             value="expense"
             checked={type === "expense"}
             onChange={() => setType("expense")}
-          />
-          지출
+          /> 지출
         </label>
       </div>
 
-      <div style={{ display: "flex", gap: "10px", alignItems: "center", marginBottom: "10px" }}>
+      <div style={{ display: "flex", gap: "10px", marginBottom: "10px" }}>
         <select
           value={category}
           onChange={(e) => setCategory(e.target.value)}
@@ -150,11 +156,11 @@ export default function ExpenseForm({ onSubmitComplete }) {
             <option key={i} value={cat}>{cat}</option>
           ))}
         </select>
-        <button type="button" onClick={() => { setModalType("category"); setOpenModal(true); }}>➕ 추가</button>
-        <button type="button" onClick={() => handleDeleteItem("category")}>🗑 삭제</button>
+        <button type="button" onClick={() => { setModalType("category"); setOpenModal(true); }}>➕</button>
+        <button type="button" onClick={() => handleDeleteItem("category")}>🗑</button>
       </div>
 
-      <div style={{ display: "flex", gap: "10px", alignItems: "center", marginBottom: "10px" }}>
+      <div style={{ display: "flex", gap: "10px", marginBottom: "10px" }}>
         <select
           value={payment}
           onChange={(e) => setPayment(e.target.value)}
@@ -166,8 +172,8 @@ export default function ExpenseForm({ onSubmitComplete }) {
             <option key={i} value={p}>{p}</option>
           ))}
         </select>
-        <button type="button" onClick={() => { setModalType("payment"); setOpenModal(true); }}>➕ 추가</button>
-        <button type="button" onClick={() => handleDeleteItem("payment")}>🗑 삭제</button>
+        <button type="button" onClick={() => { setModalType("payment"); setOpenModal(true); }}>➕</button>
+        <button type="button" onClick={() => handleDeleteItem("payment")}>🗑</button>
       </div>
 
       <input
@@ -204,7 +210,9 @@ export default function ExpenseForm({ onSubmitComplete }) {
         <Box
           sx={{
             position: "absolute",
-            top: "50%", left: "50%", transform: "translate(-50%, -50%)",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
             width: 300,
             bgcolor: "background.paper",
             borderRadius: 2,

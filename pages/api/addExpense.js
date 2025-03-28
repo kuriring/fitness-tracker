@@ -1,5 +1,5 @@
 import { db } from "../../lib/firebase";
-import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { collection, addDoc } from "firebase/firestore";
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
@@ -7,9 +7,9 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { amount, type, category, payment, memo } = req.body;
+    const { amount, type, category, payment, memo, date } = req.body;
 
-    if (!amount || !type || !category || !payment) {
+    if (!amount || !type || !category || !payment || !date) {
       return res.status(400).json({ error: "필수 항목이 누락되었습니다." });
     }
 
@@ -19,7 +19,7 @@ export default async function handler(req, res) {
       category,
       payment,
       memo,
-      date: serverTimestamp(),
+      date: new Date(date), // ✅ 클라이언트가 보낸 날짜를 사용
     });
 
     res.status(200).json({ id: docRef.id });

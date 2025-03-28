@@ -1,4 +1,3 @@
-// BudgetDashboard.js
 import React, { useState, useEffect } from "react";
 import {
   format,
@@ -16,13 +15,21 @@ import { Modal, Box } from "@mui/material";
 import { useRouter } from "next/router";
 
 export default function BudgetDashboard() {
-  const router = useRouter(); // ✅ 추가된 부분
+  const router = useRouter();
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [dailySummary, setDailySummary] = useState({});
   const [summary, setSummary] = useState({ income: 0, expense: 0 });
   const [allData, setAllData] = useState([]);
   const [selectedDetailDate, setSelectedDetailDate] = useState(null);
   const [showForm, setShowForm] = useState(false);
+
+  // 🔧 날짜 포맷 안전 처리
+  const getDateObj = (d) => {
+    if (!d) return null;
+    if (d instanceof Date) return d;
+    if (typeof d.toDate === "function") return d.toDate();
+    return new Date(d);
+  };
 
   const fetchData = async () => {
     const snapshot = await getDocs(collection(db, "expenses"));
@@ -35,8 +42,8 @@ export default function BudgetDashboard() {
 
     const currentMonth = format(selectedDate, "yyyy-MM");
     const filtered = data.filter((item) => {
-      const date = format(item.date.toDate(), "yyyy-MM");
-      return date === currentMonth;
+      const date = getDateObj(item.date);
+      return format(date, "yyyy-MM") === currentMonth;
     });
 
     const daily = {};
@@ -44,7 +51,7 @@ export default function BudgetDashboard() {
     let totalExpense = 0;
 
     filtered.forEach((item) => {
-      const dateStr = format(item.date.toDate(), "yyyy-MM-dd");
+      const dateStr = format(getDateObj(item.date), "yyyy-MM-dd");
       if (!daily[dateStr]) daily[dateStr] = { income: 0, expense: 0 };
       if (item.type === "income") {
         daily[dateStr].income += item.amount;
@@ -70,13 +77,6 @@ export default function BudgetDashboard() {
     setSelectedDetailDate(null);
   };
 
-  const start = startOfMonth(selectedDate);
-  const end = endOfMonth(selectedDate);
-  const daysInMonth = eachDayOfInterval({ start, end });
-
-  const startDay = getDay(start);
-  const blankDaysBefore = Array(startDay).fill(null);
-
   const handleDateClick = (dateObj) => {
     const clickedDateStr = format(dateObj, "yyyy-MM-dd");
     setSelectedDetailDate(clickedDateStr);
@@ -94,16 +94,22 @@ export default function BudgetDashboard() {
   };
 
   const detailEntries = allData.filter((entry) => {
-    const dateStr = format(entry.date.toDate(), "yyyy-MM-dd");
+    const dateStr = format(getDateObj(entry.date), "yyyy-MM-dd");
     return selectedDetailDate === dateStr;
   });
+
+  const start = startOfMonth(selectedDate);
+  const end = endOfMonth(selectedDate);
+  const daysInMonth = eachDayOfInterval({ start, end });
+  const startDay = getDay(start);
+  const blankDaysBefore = Array(startDay).fill(null);
 
   return (
     <div className={styles.container}>
       <div className={styles.headerRow}>
-      <button
-            onClick={() => router.push("/dashboard")}
-            style={{
+        <button
+          onClick={() => router.push("/dashboard")}
+          style={{
             position: "absolute",
             top: "10px",
             left: "10px",
@@ -113,18 +119,15 @@ export default function BudgetDashboard() {
             border: "none",
             borderRadius: "4px",
             cursor: "pointer",
-            fontSize: "0.9rem"
-            }}
+            fontSize: "0.9rem",
+          }}
         >
-            ⬅️ Dashboard
-            </button>
+          ⬅️ Dashboard
+        </button>
         <button onClick={() => handleMonthChange(-1)}>◀</button>
         <h2>{format(selectedDate, "yyyy년 M월", { locale: ko })}</h2>
         <button onClick={() => handleMonthChange(1)}>▶</button>
-        <button
-          className={styles.addButton}
-          onClick={() => setShowForm(true)}
-        >
+        <button className={styles.addButton} onClick={() => setShowForm(true)}>
           ＋
         </button>
       </div>
@@ -143,10 +146,12 @@ export default function BudgetDashboard() {
             borderRadius: 2,
           }}
         >
-          <ExpenseForm onSubmitComplete={() => {
-            fetchData();
-            setShowForm(false);
-          }} />
+          <ExpenseForm
+            onSubmitComplete={() => {
+              fetchData();
+              setShowForm(false);
+            }}
+          />
         </Box>
       </Modal>
 
@@ -174,11 +179,9 @@ export default function BudgetDashboard() {
         {blankDaysBefore.map((_, idx) => (
           <div key={`blank-${idx}`} className={styles.dateCell}></div>
         ))}
-
         {daysInMonth.map((date) => {
           const dateStr = format(date, "yyyy-MM-dd");
           const entry = dailySummary[dateStr];
-
           return (
             <div
               key={dateStr}
@@ -229,7 +232,9 @@ export default function BudgetDashboard() {
                   <span>
                     <strong>
                       {entry.type === "income" ? "💰 수입" : "💸 지출"}
-                    </strong>{" "}· {entry.category} · {entry.amount.toLocaleString()}원 · {entry.payment} · {entry.memo}
+                    </strong>{" "}
+                    · {entry.category} · {entry.amount.toLocaleString()}원 ·{" "}
+                    {entry.payment} · {entry.memo}
                   </span>
                   <button
                     onClick={() => handleDelete(entry.id)}
