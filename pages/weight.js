@@ -30,8 +30,13 @@ export default function WeightEntry() {
       const querySnapshot = await getDocs(q);
       const data = querySnapshot.docs.map((doc) => {
         const dateObj = doc.data().date?.toDate();
-        const dateStr = dateObj?.toLocaleDateString("ko-KR");
-        const yearMonth = dateObj?.toISOString().slice(0, 7); // YYYY-MM
+        const dateStr = dateObj?.toLocaleDateString("ko-KR"); // "2025. 4. 1."
+        
+        // ✅ 한국시간 기준으로 월을 계산
+        const year = dateObj?.getFullYear();
+        const month = String(dateObj?.getMonth() + 1).padStart(2, "0"); // 1~12
+        const yearMonth = `${year}-${month}`; // "2025-04"
+      
         return {
           id: doc.id,
           weight: doc.data().weight,

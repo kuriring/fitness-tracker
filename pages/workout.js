@@ -10,7 +10,7 @@ export default function Workout() {
   const [message, setMessage] = useState("");
   const router = useRouter();
 
-  const categories = ["FORCE", "CF", "MoMT", "MoMster Day", "CF ELITE"];
+  const categories = ["FORCE", "CF", "MoMT", "MoMster Day", "CF ELITE","etc"];
 
   const handleSubmit = async (e) => {
     e.preventDefault();
