@@ -33,8 +33,8 @@ export default function Dashboard() {
       <aside className="sidebar">
         <div className="sidebar-title">🏋️ Fitness</div>
         <nav className="nav">
-          <NavItem icon={<FaDumbbell />} label="운동 기록 추가" onClick={() => router.push("/workout")} />
-          <NavItem icon={<FaClipboardList />} label="운동 기록 보기" onClick={() => router.push("/workouts")} />
+          {/* <NavItem icon={<FaDumbbell />} label="운동 기록 추가" onClick={() => router.push("/workout")} /> */}
+          <NavItem icon={<FaClipboardList />} label="운동 기록" onClick={() => router.push("/workouts")} />
           <NavItem icon={<FaWeight />} label="체중 입력" onClick={() => router.push("/weight")} />
           <NavItem icon={<FaChartLine />} label="체중 변화 추이" onClick={() => router.push("/weight-trend")} />
           <NavItem icon={<FaTrophy />} label="챌린지" onClick={() => router.push("/challenge")} />
