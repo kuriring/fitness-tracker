@@ -142,9 +142,6 @@ export default function WeightPage() {
 
       <div style={{ display: "flex", justifyContent: "center", gap: "10px", marginBottom: "20px" }}>
         <button onClick={() => router.push("/dashboard")} style={navButtonStyle("#FF9800")}>⬅ 대시보드</button>
-      </div>
-
-      <div style={{ marginBottom: "20px", display: "flex", gap: "10px", justifyContent: "center" }}>
         <input
           type="number"
           placeholder="체중 (kg)"
@@ -173,7 +170,7 @@ export default function WeightPage() {
         </button>
       </div>
 
-      <div style={{ textAlign: "center", marginBottom: "20px" }}>
+      <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: "20px" }}>
         <select
           value={filterDays}
           onChange={(e) => setFilterDays(Number(e.target.value))}
@@ -186,13 +183,13 @@ export default function WeightPage() {
           <option value={365}>최근 1년</option>
           <option value={10000}>전체 보기</option>
         </select>
-
-        {(averageWeight || latestWeight) && (
-          <p style={{ marginTop: "10px", fontSize: "16px", color: "#444" }}>
-            📏 평균 체중: <strong>{averageWeight} kg</strong> 📌 최근 체중: <strong>{latestWeight} kg</strong>
-          </p>
-        )}
       </div>
+
+      {(averageWeight || latestWeight) && (
+        <p style={{ marginTop: "-10px", fontSize: "16px", color: "#444", textAlign: "right" }}>
+          📏 평균 체중: <strong>{averageWeight} kg</strong> 📌 최근 체중: <strong>{latestWeight} kg</strong>
+        </p>
+      )}
 
       <ResponsiveContainer width="100%" height={300}>
         <LineChart data={filteredData}>

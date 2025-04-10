@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Modal, Box, Typography, Button } from "@mui/material";
 import { db } from "../lib/firebase";
-import { doc, getDoc, updateDoc } from "firebase/firestore";
+import { doc, getDoc } from "firebase/firestore";
 import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 
@@ -13,12 +13,8 @@ export default function ExpenseForm({ onSubmitComplete }) {
   const [memo, setMemo] = useState("");
   const [date, setDate] = useState(new Date());
 
-  const [categories, setCategories] = useState([]);
+  const [categories, setCategories] = useState({ income: [], expense: [] });
   const [payments, setPayments] = useState([]);
-
-  const [openModal, setOpenModal] = useState(false);
-  const [modalType, setModalType] = useState("");
-  const [newItem, setNewItem] = useState("");
 
   useEffect(() => {
     const fetchSettings = async () => {
@@ -27,7 +23,7 @@ export default function ExpenseForm({ onSubmitComplete }) {
         const snap = await getDoc(ref);
         if (snap.exists()) {
           const data = snap.data();
-          setCategories(Array.isArray(data.categories) ? data.categories : []);
+          setCategories(data.categories || { income: [], expense: [] });
           setPayments(Array.isArray(data.payments) ? data.payments : []);
         }
       } catch (err) {
@@ -36,11 +32,6 @@ export default function ExpenseForm({ onSubmitComplete }) {
     };
     fetchSettings();
   }, []);
-
-  const updateSettings = async (field, updatedList) => {
-    const settingsRef = doc(db, "settings", "global");
-    await updateDoc(settingsRef, { [field]: updatedList });
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -79,36 +70,7 @@ export default function ExpenseForm({ onSubmitComplete }) {
     }
   };
 
-  const handleAddItem = async () => {
-    if (!newItem.trim()) return;
-    if (modalType === "category") {
-      const updated = [...categories, newItem];
-      setCategories(updated);
-      setCategory(newItem);
-      await updateSettings("categories", updated);
-    } else if (modalType === "payment") {
-      const updated = [...payments, newItem];
-      setPayments(updated);
-      setPayment(newItem);
-      await updateSettings("payments", updated);
-    }
-    setNewItem("");
-    setOpenModal(false);
-  };
-
-  const handleDeleteItem = async (type) => {
-    if (type === "category" && category) {
-      const updated = categories.filter((c) => c !== category);
-      setCategories(updated);
-      setCategory("");
-      await updateSettings("categories", updated);
-    } else if (type === "payment" && payment) {
-      const updated = payments.filter((p) => p !== payment);
-      setPayments(updated);
-      setPayment("");
-      await updateSettings("payments", updated);
-    }
-  };
+  const selectedCat = (categories[type] || []).find((c) => c.name === category);
 
   return (
     <form onSubmit={handleSubmit} style={{ padding: "20px", maxWidth: "500px", margin: "auto" }}>
@@ -130,7 +92,7 @@ export default function ExpenseForm({ onSubmitComplete }) {
             name="type"
             value="income"
             checked={type === "income"}
-            onChange={() => setType("income")}
+            onChange={() => { setType("income"); setCategory(""); }}
           /> 수입
         </label>
         <label style={{ marginLeft: "15px" }}>
@@ -139,9 +101,17 @@ export default function ExpenseForm({ onSubmitComplete }) {
             name="type"
             value="expense"
             checked={type === "expense"}
-            onChange={() => setType("expense")}
+            onChange={() => { setType("expense"); setCategory(""); }}
           /> 지출
         </label>
+      </div>
+
+      <div style={{ marginBottom: "10px" }}>
+        {selectedCat && (
+          <div style={{ color: selectedCat.color }}>
+            선택된 카테고리: {selectedCat.icon} <strong>{selectedCat.name}</strong>
+          </div>
+        )}
       </div>
 
       <div style={{ display: "flex", gap: "10px", marginBottom: "10px" }}>
@@ -152,12 +122,12 @@ export default function ExpenseForm({ onSubmitComplete }) {
           style={{ flex: 1, padding: "8px" }}
         >
           <option value="">카테고리 선택</option>
-          {categories.map((cat, i) => (
-            <option key={i} value={cat}>{cat}</option>
+          {(categories[type] || []).map((cat, i) => (
+            <option key={i} value={cat.name}>
+              {cat.icon} {cat.name}
+            </option>
           ))}
         </select>
-        <button type="button" onClick={() => { setModalType("category"); setOpenModal(true); }}>➕</button>
-        <button type="button" onClick={() => handleDeleteItem("category")}>🗑</button>
       </div>
 
       <div style={{ display: "flex", gap: "10px", marginBottom: "10px" }}>
@@ -172,8 +142,6 @@ export default function ExpenseForm({ onSubmitComplete }) {
             <option key={i} value={p}>{p}</option>
           ))}
         </select>
-        <button type="button" onClick={() => { setModalType("payment"); setOpenModal(true); }}>➕</button>
-        <button type="button" onClick={() => handleDeleteItem("payment")}>🗑</button>
       </div>
 
       <input
@@ -205,36 +173,11 @@ export default function ExpenseForm({ onSubmitComplete }) {
       >
         저장
       </button>
-
-      <Modal open={openModal} onClose={() => setOpenModal(false)}>
-        <Box
-          sx={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            width: 300,
-            bgcolor: "background.paper",
-            borderRadius: 2,
-            boxShadow: 24,
-            p: 4,
-          }}
-        >
-          <Typography variant="h6" gutterBottom>
-            {modalType === "category" ? "카테고리 추가" : "결제 수단 추가"}
-          </Typography>
-          <input
-            type="text"
-            value={newItem}
-            onChange={(e) => setNewItem(e.target.value)}
-            placeholder={modalType === "category" ? "새 카테고리 입력" : "새 결제 수단 입력"}
-            style={{ width: "100%", padding: "8px", marginBottom: "12px" }}
-          />
-          <Button variant="contained" onClick={handleAddItem} fullWidth>
-            추가
-          </Button>
-        </Box>
-      </Modal>
+      <div style={{ textAlign: "right", marginTop: "10px" }}>
+  <a href="/settings" style={{ fontSize: "14px", color: "#555" }}>
+    ⚙️ 카테고리 직접 관리하기
+  </a>
+</div>
     </form>
   );
 }

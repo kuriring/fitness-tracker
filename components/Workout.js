@@ -10,7 +10,7 @@ export default function Workout({ onSubmitComplete }) { // 🔥 props로 받아�
   const [message, setMessage] = useState("");
   const router = useRouter();
 
-  const categories = ["FORCE", "CF", "MoMT", "MoMster Day", "CF ELITE"];
+  const categories = ["FORCE", "CF", "MoMT", "MoMster Day", "CF ELITE","ETC"];
 
   const handleSubmit = async (e) => {
     e.preventDefault();

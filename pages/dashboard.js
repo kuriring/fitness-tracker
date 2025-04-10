@@ -33,18 +33,19 @@ export default function Dashboard() {
       <aside className="sidebar">
         <div className="sidebar-title">🏋️ Fitness</div>
         <nav className="nav">
-          {/* <NavItem icon={<FaDumbbell />} label="운동 기록 추가" onClick={() => router.push("/workout")} /> */}
           <NavItem icon={<FaClipboardList />} label="운동 기록" onClick={() => router.push("/workouts")} />
-          <NavItem icon={<FaWeight />} label="체중 입력" onClick={() => router.push("/weight")} />
-          <NavItem icon={<FaChartLine />} label="체중 변화 추이" onClick={() => router.push("/weight-trend")} />
+          {/* <NavItem icon={<FaWeight />} label="체중 입력" onClick={() => router.push("/weight")} /> */}
+          <NavItem icon={<FaChartLine />} label="체중 기록" onClick={() => router.push("/weight-trend")} />
+          <NavItem icon={<FaDumbbell />} label="1RM 기록" onClick={() => router.push("/one-rep-max")} />
           <NavItem icon={<FaTrophy />} label="챌린지" onClick={() => router.push("/challenge")} />
-          <NavItem icon={<FaDumbbell />} label="1RM 기록실" onClick={() => router.push("/one-rep-max")} />
+          <div className="sidebar-title">🍽️ Diet</div>
+          <NavItem icon={<FaClipboardList />} label="식단 기록" onClick={() => router.push("/DietList")} />
           <div className="sidebar-title">💰 Budget</div>
-          <NavItem icon={<FaMoneyBillWave />} label="Budget" onClick={() => router.push("/BudgetDashboard")} /> {/* ✅ 추가 */}
+          <NavItem icon={<FaMoneyBillWave />} label="가계부" onClick={() => router.push("/BudgetDashboard")} />
           <button className="logout-button" onClick={handleLogout}>
             <FaSignOutAlt /> 로그아웃
           </button>
-        </nav>
+</nav>
       </aside>
 
       {/* ▶ Main */}
